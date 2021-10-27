@@ -7,7 +7,7 @@
 [![codecov](https://codecov.io/gh/cudmore/napari-mm/branch/main/graph/badge.svg)](https://codecov.io/gh/cudmore/napari-mm)
 [![napari hub](https://img.shields.io/endpoint?url=https://api.napari-hub.org/shields/napari-mm)](https://napari-hub.org/plugins/napari-mm)
 
-Napari plugin to load and visualize 3D image time series created in Map Manager
+Napari plugin to load and visualize 3D image time series created in [Map Manager](https://mapmanager.net).
 
 ----------------------------------
 
