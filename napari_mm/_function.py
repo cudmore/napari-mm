@@ -27,7 +27,8 @@ def napari_experimental_provide_function():
 
 
 # 1.  First example, a simple function that thresholds an image and creates a labels layer
-def threshold(data: "napari.types.ImageData", threshold: int) -> "napari.types.LabelsData":
+# abb parameters create Qt objects? What is the limit here, what objects can I create? Can I create a list???
+def threshold(data: "napari.types.ImageData", threshold: int, my_xxx: int) -> "napari.types.LabelsData":
     """Threshold an image and return a mask."""
     return (data > threshold).astype(int)
 

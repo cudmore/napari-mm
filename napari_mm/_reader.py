@@ -34,6 +34,8 @@ def napari_get_reader(path):
         # so we are only going to look at the first file.
         path = path[0]
 
+    print('=== napari_get_reader() path:', path)
+    
     # if we know we cannot read the file, we immediately return None.
     if not path.endswith(".npy"):
         return None

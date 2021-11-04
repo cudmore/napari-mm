@@ -11,7 +11,7 @@ from qtpy.QtWidgets import QWidget, QHBoxLayout, QPushButton
 from magicgui import magic_factory
 
 
-class ExampleQWidget(QWidget):
+class ExampleQtWidget(QWidget):
     # your QWidget.__init__ can optionally request the napari viewer instance
     # in one of two ways:
     # 1. use a parameter called `napari_viewer`, as done here
@@ -32,10 +32,10 @@ class ExampleQWidget(QWidget):
 
 @magic_factory
 def example_magic_widget(img_layer: "napari.layers.Image"):
-    print(f"you have selected {img_layer}")
+    print(f"abb you have selected img_layer: {img_layer}")
 
 
 @napari_hook_implementation
 def napari_experimental_provide_dock_widget():
     # you can return either a single widget, or a sequence of widgets
-    return [ExampleQWidget, example_magic_widget]
+    return [ExampleQtWidget, example_magic_widget]
