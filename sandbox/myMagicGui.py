@@ -13,7 +13,7 @@ from enum import Enum
 
 #
 # Example off magicgui website
-# 
+
 class Medium(Enum):
     Glass = 1.520
     Oil = 1.515

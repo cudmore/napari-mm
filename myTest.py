@@ -26,21 +26,23 @@ def _loadLine(path):
 path = '/home/cudmore/Downloads/bil/d9/01/rr30a_s1_ch2.tif'
 linePath = '/home/cudmore/Downloads/bil/d9/01/line/rr30a_s0_l.txt'
 
-_loadLine(linePath)
+#_loadLine(linePath)
 
-image = imread(path)
+#image = imread(path)
 #print(image.shape)
 
 #image = image[20,:,:]
 #image = image.astype(np.uint8)
 
 # 2
+'''
 viewer = napari.Viewer()
 
 imageLayer = viewer.add_image(image, colormap='green', blending='additive')
 
 points = np.array([[100, 100], [200, 200], [300, 100]])
 pointsLayer = viewer.add_points(points, size=30)
+'''
 
 #viewer.add_image(gradient(image, disk(5)), name='gradient', colormap='magenta', blending='additive')
 
@@ -53,6 +55,26 @@ pointsLayer = viewer.add_points(points, size=30)
 
 # 4
 #profiler._list_values()
+
+# global to keep track of selected point/shape
+gMySelectedPoint = None
+
+def getPointFromSet(setOfPnts):
+    """
+    Retun one index from a set of index.
+    
+    Args:
+        setOfPnts (set): Set of point indices
+    
+    Note:
+        todo: currently modifies setOfPnts with pop !!!
+    """
+    if len(setOfPnts) != 1:
+        print(f'error getSelectedPoint() expecting set of length 1 but got length {len(setOfPnts)}, setOfPnts: {setOfPnts}')
+        return None
+    item = setOfPnts.pop()
+    return item
+
 
 def mySelectionChanged(event):
     print('=== mySelectionChanged()')
@@ -92,11 +114,13 @@ def print_layer_name(event):
     print('  event.source.mode:', event.source.mode)
 
     # 1) when mode is 'add' we get added point index in selected_data set
-    # point 3 would be selected_data={3}
+    #   point 3 would be selected_data={3}
     # 2) when mode is 'select' and user finishes dragging we get point that was moved
     # 3) when user deletes a point, select_data=set()
     #    we need to keep track of selected point with worker 'selectedDataWorker'(below)
     #    When we delete, be sure to set local copy of selectedData to none (handled in worker???)
+    #       20211104 delete is not triggering any callbacks !!!!!!!!!!!!
+
     print('  event.source.selected_data:', event.source.selected_data)
 
     # list of list of points
@@ -112,11 +136,32 @@ def print_layer_name(event):
     # we can always query layer for state (we can also set)
     # print('  pointsLayer.mode:', pointsLayer.mode)
 
+    selectedDataIsEmpty = event.source.selected_data == set()
+    
+    isAdd = event.source.mode == 'add'
+    isFinishedDrag = event.source.mode == 'select' and not selectedDataIsEmpty
+    isDelete = event.source.selected_data == set()
 
-# when we switch between layers
-viewer.layers.selection.events.changed.connect(mySelectionChanged)
+    print(f'  isAdd: {isAdd}')
+    print(f'  isFinishedDrag: {isFinishedDrag}')
+    print(f'  isDelete: {isDelete}')
 
-pointsLayer.events.data.connect(print_layer_name)
+    if isAdd:
+        # always last point
+        newPnt = getPointFromSet(event.source.selected_data)
+        print(f'    newPnt: {newPnt}')
+        newPosition = event.source.data[newPnt]
+        print(f'    new position: {newPosition}')
+    elif isFinishedDrag:
+        draggedPnt = getPointFromSet(event.source.selected_data)
+        print(f'    draggedPnt: {draggedPnt}')
+        newPosition = event.source.data[draggedPnt]
+        print(f'    new position: {newPosition}')
+    elif isDelete:
+        # we need to use last pnt selection from worker thread
+        print(f'    gMySelectedPoint: {gMySelectedPoint}')
+
+
 # these work
 # for a list of events, see
 # https://napari.org/docs/0.3.7/_modules/napari/layers/base/base.html
@@ -163,8 +208,13 @@ def selectedDataWorker(pointsLayer, poll = 1):
             # triggered when mode='select' and user click a point/shape
             # When user clicks canvas, all points are de-selected
             #   selectedData is empty set()
+            global gMySelectedPoint
+            gMySelectedPoint = getPointFromSet(selectedData)
+            
             print()
             print('  === onSelectedDataChanged() WORKER', selectedData)
+            print(f'    selectedData: {selectedData}')
+            print(f'    gMySelectedPoint: {gMySelectedPoint}')
             print()
 
     """
@@ -190,10 +240,25 @@ def selectedDataWorker(pointsLayer, poll = 1):
 
     return(_watchSelectedData(pointsLayer))
 
-worker = selectedDataWorker(
-    pointsLayer,
-    poll = 1/10
-)
 
-#
-napari.run() 
+
+if __name__ == '__main__':
+    path = '/home/cudmore/Downloads/bil/d9/01/rr30a_s1_ch2.tif'
+    image = imread(path)
+
+    viewer = napari.Viewer()
+
+    imageLayer = viewer.add_image(image, colormap='green', blending='additive')
+
+    points = np.array([[100, 100], [200, 200], [300, 100]])
+    pointsLayer = viewer.add_points(points, size=30)
+
+    # when we switch between layers
+    viewer.layers.selection.events.changed.connect(mySelectionChanged)
+
+    pointsLayer.events.data.connect(print_layer_name)
+
+    worker = selectedDataWorker(pointsLayer, poll = 1/10)
+
+    #
+    napari.run() 
