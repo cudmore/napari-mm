@@ -56,3 +56,19 @@ z coordinate of the compartment
 radius of the compartment
 parent compartment
 Every compartment has only one parent and the parent compartment for the first point in each file is always -1 (if the file does not include the soma information then the originating point of the tree will be connected to a parent of -1). The index for parent compartments are always less than child compartments. Loops and unconnected branches are excluded. All trees should originate from the soma and have parent type 1 if the file includes soma information. Soma can be a single point or more than one point. When the soma is encoded as one line in the SWC, it is interpreted as a "sphere". When it is encoded by more than 1 line, it could be a set of tapering cylinders (as in some pyramidal cells) or even a 2D projected contour ("circumference").
+
+## Turned off warnings during mouse drag
+
+In file
+
+```
+mm_env/lib/python3.8/site-packages/vispy/app/backends/_qt.py
+```
+
+```
+# abb
+with warnings.catch_warnings():
+	warnings.simplefilter('ignore')
+	if q & qtmod:
+		mod += (v,)
+```

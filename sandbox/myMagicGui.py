@@ -50,19 +50,19 @@ def myTableChanged(d : dict):
 
     This is a convenience wrapper/callback provided by magicgui?
 
-    
+
     Params:
         d (dict): Dictionary of new value and underlying row and column
-    
+
         For example:
             d = {'data': <value>, 'row': int, 'column': int, 'column_header': str, 'row_header': str}
-    
+
             Where <value> of 'data' will be new 'value'
             and <value> will be proper type, str if str, int if int, float if float
             does not support list or dict (they are received as str)
     """
     print('=== (1) myTableChanged()')
-    print(f"  d['data'] is "{d['data']}"" with type: {type(d['data'])}")
+    print(f"  d['data'] is '{d['data']}' with type: {type(d['data'])}")
     print(d)
 
 # see: https://doc.qt.io/qt-5.15/qtablewidget.html
@@ -70,7 +70,7 @@ def myTableChanged(d : dict):
 def onItemChanged(item):
     """
     Resond to user editing a single cell.
-    
+
     This is a native callback for PyQt?
 
     Params:
@@ -90,7 +90,7 @@ def onItemChanged(item):
 def onItemClicked(item):
     """
     Respond to user clicking table.
-    
+
     Params:
         item (QTableWidgetItem): The item clicked
     """
@@ -144,6 +144,6 @@ myTable.native.selectRow(3)
 if __name__ == "__main__":
     # this works
     # snells_law.show(run=False)
-    
+
     # this works
     myTable.show(run=True)

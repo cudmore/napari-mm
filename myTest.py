@@ -23,9 +23,11 @@ def _loadLine(path):
     df = pd.read_csv(path, skiprows=skiprows)
     print(df.head())
 
-path = '/home/cudmore/Downloads/bil/d9/01/rr30a_s1_ch2.tif'
-linePath = '/home/cudmore/Downloads/bil/d9/01/line/rr30a_s0_l.txt'
+#path = '/home/cudmore/Downloads/bil/d9/01/rr30a_s1_ch2.tif'
+#linePath = '/home/cudmore/Downloads/bil/d9/01/line/rr30a_s0_l.txt'
 
+path = '/media/cudmore/data/richard/rr30a/raw/rr30a_s0_ch2.tif'
+linePath = '/media/cudmore/data/richard/rr30a/line/rr30a_s0_l.txt'
 #_loadLine(linePath)
 
 #image = imread(path)
@@ -62,10 +64,10 @@ gMySelectedPoint = None
 def getPointFromSet(setOfPnts):
     """
     Retun one index from a set of index.
-    
+
     Args:
         setOfPnts (set): Set of point indices
-    
+
     Note:
         todo: currently modifies setOfPnts with pop !!!
     """
@@ -78,38 +80,38 @@ def getPointFromSet(setOfPnts):
 
 def mySelectionChanged(event):
     print('=== mySelectionChanged()')
-    
+
 def print_layer_name(event):
     """
     event is <class 'napari.utils.events.event.Event'>
-    
+
     event.source.selected_data is a set of selected point indices
-    
+
     use just the selected points to update out table
 
     on highlight, use selected_data {} and compare to stored value
     to determine if it is new
     """
     print('=== print_layer_name()')
-    
+
     #print('vars(event):', vars(event))
-    
+
     print('  type(event)', type(event))
-    
+
     # event.source is the layer (like Points or Shapes)
     print('  type(event.source)', type(event.source))
-    
+
     # event.source is a HUGE object
     #print('vars(event.source):', vars(event.source))
     #print('   ', type(event.source))
-    
+
     # event.type is in {'interactive', 'mode', 'data'}
     print('  type(event.type):', type(event.type))
     print('  event.type:', event.type)
-    
+
     # name is name of layer(can be set by user in interface)
     print('  event.source.name:', event.source.name)
-    
+
     # mode is {'add', 'select', 'pan-zoom'}
     print('  event.source.mode:', event.source.mode)
 
@@ -131,13 +133,13 @@ def print_layer_name(event):
 
     # event.source.data is a list of list of points (can be 1000's)
     #print('  data:', event.source.data)
-    
+
     # see: https://napari.org/docs/0.3.7/_modules/napari/layers/points/points.html
     # we can always query layer for state (we can also set)
     # print('  pointsLayer.mode:', pointsLayer.mode)
 
     selectedDataIsEmpty = event.source.selected_data == set()
-    
+
     isAdd = event.source.mode == 'add'
     isFinishedDrag = event.source.mode == 'select' and not selectedDataIsEmpty
     isDelete = event.source.selected_data == set()
@@ -197,20 +199,20 @@ viewer.layers.selection.events.changed.connect(xxxOnSelection)
 
 # I need this to get selected point (why so complicated)
 # This simply polls pointsLayer.selected_data and trigger when it changes
-def selectedDataWorker(pointsLayer, poll = 1):  
+def selectedDataWorker(pointsLayer, poll = 1):
     """
     Show selected data
     """
     def onSelectedDataChanged(selectedData):
         if selectedData is not None:
             #if len(selectedData) > 0:
-            
+
             # triggered when mode='select' and user click a point/shape
             # When user clicks canvas, all points are de-selected
             #   selectedData is empty set()
             global gMySelectedPoint
             gMySelectedPoint = getPointFromSet(selectedData)
-            
+
             print()
             print('  === onSelectedDataChanged() WORKER', selectedData)
             print(f'    selectedData: {selectedData}')
@@ -229,7 +231,7 @@ def selectedDataWorker(pointsLayer, poll = 1):
         while True:
             time.sleep(poll)
             oldSelectedData = selectedData
-            
+
             # here we are repeatedly polling the pointsLayer.selected_data
             selectedData = pointsLayer.selected_data
 
@@ -243,7 +245,11 @@ def selectedDataWorker(pointsLayer, poll = 1):
 
 
 if __name__ == '__main__':
-    path = '/home/cudmore/Downloads/bil/d9/01/rr30a_s1_ch2.tif'
+    #path = '/home/cudmore/Downloads/bil/d9/01/rr30a_s1_ch2.tif'
+
+    path = '/media/cudmore/data/richard/rr30a/raw/rr30a_s0_ch2.tif'
+    #linePath = '/media/cudmore/data/richard/rr30a/line/rr30a_s0_l.txt'
+
     image = imread(path)
 
     viewer = napari.Viewer()
@@ -261,4 +267,4 @@ if __name__ == '__main__':
     worker = selectedDataWorker(pointsLayer, poll = 1/10)
 
     #
-    napari.run() 
+    napari.run()
